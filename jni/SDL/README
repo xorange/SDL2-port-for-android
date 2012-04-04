@@ -1,0 +1,70 @@
+This is a SDL android transplanting project.
+
+There's an origin README file of SDL which is renamed as SDL_README.
+
+This is an underconstructing project and its stableness cannot be guaranteed.
+
+And I'm working on the android transplanting and it's not done yet.
+
+This README would be a walk through document, and definately a verbose one, kinda like a working log. When finished, I would write a more decent README file and a walk through document.
+
+------------------------
+
+This SDL version is SDL-2.0.0-6302 which is obtained at http://www.libsdl.org/hg.php and I'm using android-NDK-r7b.
+
+Currently the transplanting work refers to this document: http://www.libsdl.org/tmp/SDL/README.android, which indicates that one should use the "android-project" folder to use SDL along with android-NDK.
+
+
+--#
+Folder android-project:
+/
+	AndroidManifest.xml
+	build.properties
+	build.xml
+	default.properties
+	local.properties
+	jni/
+	res/
+	src/
+
+which looks exactly like an android project with native code. Initially, the jni/ looks like this:
+jni/
+	src/
+		Android.mk	/* with: SDL_PATH := ../SDL */
+	Android.mk	/* with only: include $(call all-subdir-makefiles) */
+
+So it means there exists jni/SDL/ and the SDL shared library build rules is in this folder. So I copied SDL-2.0.0-6302/SDL to SDL-2.0.0-6302/android-project/jni/
+
+With the ffmpeg transplanting experience, I don't like using this way to port SDL because it makes me feel clumsy. I prefer build SDL shared library first, and then use NDK PREBUILD-SHARED-LIBRARY to link to the built shared library.
+
+And now I'm giving it a try. (2012-03-06)
+
+--#
+Build-Shared-Library
+
+working directory: SDL-2.0.0-6302/SDL/
+
+There's also an android-project folder in here, and I'm guessing this is because SDL2.0 is underconstruction right now. It seems the same as the initiate $SDL/android-project.
+
+Two Make function:
+subst: $(subst a,b,c), replace all the "a" in "c" with "b"
+wildcard: $(wildcard PATTERN), all files that match PATTERN
+Reference (Chinese):
+http://www.linuxsir.org/main/doc/gnumake/GNUmake_v3.80-zh_CN_html/make-08.html
+
+So the /Android.mk::LOCAL_SRC_FILES could be considered as all those files matching these PATTERNs, removing "$(LOCAL_PATH)/";
+
+recall the main transplanting document (http://www.libsdl.org/tmp/SDL/README.android), the Instruction 2 said "Move this SDL directory into the <project>/jni directory", so I'm guess I've made a mistake here. 
+
+I should use the SDL-2.0.0-6302 folder instead of the SDL-2.0.0-6302/SDL/. So I DELETE the SDL-2.0.0-6302/android-project/jni/SDL/, which builds library "SDL", while the root folder Android.mk builds library "SDL2". The java code loads "SDL2" library, which indicates that I'm right.
+
+So I use SDL-2.0.0-6302/Android.mk, SDL-2.0.0-6302/src and SDL-2.0.0-6302/include to try to build a shared library. That is, I've got:
+(new folder)/jni/
+	Android.mk
+	src/
+	include/
+ERROR FLOOD. Too naive. Things are just not right.
+
+------------------------------
+Oliver ZQ Xu
+orange-22@126.com
